@@ -17,4 +17,4 @@ export const useIsAdmin = () => {
   return { isAdmin, loading };
 };
 
-export const PLAN_PRICES: Record<string, number> = { monthly: 12, yearly: 120 };
+export const PLAN_PRICES: Record<string, number> = { monthly: 500, yearly: 5000 };

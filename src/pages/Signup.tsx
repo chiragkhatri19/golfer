@@ -51,17 +51,33 @@ const Signup = () => {
     if (userId) {
       // Wait briefly for trigger; then update.
       await new Promise(r => setTimeout(r, 400));
+      
+      // Calculate renewal date based on plan
+      const renewalDate = new Date();
+      if (plan === "monthly") {
+        renewalDate.setMonth(renewalDate.getMonth() + 1);
+      } else {
+        renewalDate.setFullYear(renewalDate.getFullYear() + 1);
+      }
+      
+      // Auto-activate subscription (mock payment - no Stripe)
       await supabase.from("profiles").update({
-        charity_id: charityId, charity_pct: 10,
+        charity_id: charityId,
+        charity_pct: 10,
         subscription_plan: plan,
-        subscription_status: "pending_payment",
+        subscription_status: "active",
+        renewal_date: renewalDate.toISOString(),
       }).eq("user_id", userId);
+      
       await supabase.from("subscriptions").upsert({
-        user_id: userId, plan, status: "pending_payment",
+        user_id: userId,
+        plan,
+        status: "active",
+        renewal_date: renewalDate.toISOString(),
       });
     }
     setLoading(false);
-    toast.success("Welcome to golfer.");
+    toast.success("Welcome to Charity Drive! Your membership is active.");
     nav("/dashboard");
   };
 
@@ -124,8 +140,8 @@ const Signup = () => {
               {step === 3 && (
                 <motion.div key="3" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }} className="grid gap-4 md:grid-cols-2">
                   {([
-                    { id: "monthly", label: "Monthly", price: "£12", sub: "per month", note: "Cancel any time." },
-                    { id: "yearly", label: "Yearly", price: "£120", sub: "per year", note: "Save 16% vs monthly." },
+                    { id: "monthly", label: "Monthly", price: "₹500", sub: "per month", note: "Cancel any time." },
+                    { id: "yearly", label: "Yearly", price: "₹5000", sub: "per year", note: "Save 16% vs monthly." },
                   ] as const).map(p => {
                     const sel = plan === p.id;
                     return (
@@ -140,7 +156,7 @@ const Signup = () => {
                     );
                   })}
                   <p className="md:col-span-2 text-xs text-muted-foreground">
-                    Secure checkout opens after you create your account. Your membership activates once payment is confirmed.
+                    Your membership activates immediately. No payment required for demo.
                   </p>
                 </motion.div>
               )}

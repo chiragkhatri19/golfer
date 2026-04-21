@@ -54,7 +54,7 @@ const AdminWinners = () => {
                 <p className="text-xs text-muted-foreground">{p?.email}</p>
               </div>
               <div className="col-span-2"><p className="font-display text-lg">{w.tier}-match</p></div>
-              <div className="col-span-2"><p className="font-display text-lg">£{Number(w.prize_amount).toFixed(2)}</p></div>
+              <div className="col-span-2"><p className="font-display text-lg">₹${Number(w.prize_amount).toFixed(2)}</p></div>
               <div className="col-span-2">
                 {w.proof_url ? (
                   <Button variant="outline" size="sm" onClick={() => viewProof(w.proof_url!)}><Eye className="mr-2 h-3 w-3" /> Proof</Button>

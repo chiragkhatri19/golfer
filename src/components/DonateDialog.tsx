@@ -52,7 +52,7 @@ export const DonateDialog = ({ charityId, charityName, trigger }: { charityId: s
           <DialogDescription>A one-off contribution, separate from your subscription.</DialogDescription>
         </DialogHeader>
         <form onSubmit={submit} className="space-y-4">
-          <div className="space-y-2"><Label>Amount (£)</Label>
+          <div className="space-y-2"><Label>Amount (₹)</Label>
             <Input type="number" min={1} step="0.01" value={amount} onChange={e => setAmount(e.target.value)} required /></div>
           <div className="space-y-2"><Label>Your name (optional)</Label>
             <Input value={name} onChange={e => setName(e.target.value)} maxLength={100} /></div>

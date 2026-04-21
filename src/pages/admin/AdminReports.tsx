@@ -28,10 +28,10 @@ const AdminReports = () => {
         { label: "Active subscriptions", value: String((activeProfiles || []).length) },
         { label: "Charities listed", value: String(charitiesCount || 0) },
         { label: "Published draws", value: String(drawsCount || 0) },
-        { label: "Recurring revenue", value: `£${monthlyRevenue.toFixed(2)}`, sub: "all active plans" },
-        { label: "Charity contribution", value: `£${charityContribActual.toFixed(2)}`, sub: "actual, per member %" },
-        { label: "One-off donations", value: `£${totalDonations.toFixed(2)}`, sub: `${(donations || []).length} gifts` },
-        { label: "Lifetime payouts", value: `£${totalPayouts.toFixed(2)}` },
+        { label: "Recurring revenue", value: `₹${monthlyRevenue.toFixed(2)}`, sub: "all active plans" },
+        { label: "Charity contribution", value: `₹${charityContribActual.toFixed(2)}`, sub: "actual, per member %" },
+        { label: "One-off donations", value: `₹${totalDonations.toFixed(2)}`, sub: `${(donations || []).length} gifts` },
+        { label: "Lifetime payouts", value: `₹${totalPayouts.toFixed(2)}` },
         { label: "Pending payouts", value: String((winners || []).filter(w => w.status !== "paid").length) },
       ]);
     })();

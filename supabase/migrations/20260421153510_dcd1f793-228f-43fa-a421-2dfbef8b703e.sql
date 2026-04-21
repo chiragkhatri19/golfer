@@ -52,7 +52,7 @@ RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
 BEGIN
   IF TG_OP = 'INSERT' THEN
     INSERT INTO public.notifications (user_id, title, body, link)
-    VALUES (NEW.user_id, 'You won!', 'You matched ' || NEW.tier || ' numbers — £' || NEW.prize_amount || '. Upload your proof.', '/dashboard');
+    VALUES (NEW.user_id, 'You won!', 'You matched ' || NEW.tier || ' numbers — ₹' || NEW.prize_amount || '. Upload your proof.', '/dashboard');
   ELSIF TG_OP = 'UPDATE' AND NEW.status IS DISTINCT FROM OLD.status THEN
     INSERT INTO public.notifications (user_id, title, body, link)
     VALUES (NEW.user_id, 'Winner status: ' || NEW.status, 'Your prize for the ' || NEW.tier || '-match is now ' || NEW.status || '.', '/dashboard');

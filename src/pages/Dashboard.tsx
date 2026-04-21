@@ -146,7 +146,7 @@ const Dashboard = () => {
               </span>
             </div>
             <p className="mt-3 text-sm text-muted-foreground">
-              {planPrice ? `£${planPrice.toFixed(2)} ${profile?.subscription_plan === "yearly" ? "/ year" : "/ month"}` : ""}
+              {planPrice ? `₹${planPrice.toFixed(2)} ${profile?.subscription_plan === "yearly" ? "/ year" : "/ month"}` : ""}
               {profile?.renewal_date && ` · renews ${format(new Date(profile.renewal_date), "PP")}`}
             </p>
           </Card>
@@ -167,7 +167,7 @@ const Dashboard = () => {
               <Slider min={10} max={100} step={5} value={[profile?.charity_pct ?? 10]} onValueChange={v => updatePct(v[0])} onValueCommit={commitPct} />
               <p className="mt-3 text-xs text-muted-foreground">
                 {planPrice
-                  ? <>≈ <span className="text-foreground font-display">£{contribution.toFixed(2)}</span> per {profile?.subscription_plan === "yearly" ? "year" : "month"} to charity.</>
+                  ? <>≈ <span className="text-foreground font-display">₹${contribution.toFixed(2)}</span> per {profile?.subscription_plan === "yearly" ? "year" : "month"} to charity.</>
                   : "Activate a plan to see your contribution."}
               </p>
               {profile?.charity_id && (
@@ -247,8 +247,8 @@ const Dashboard = () => {
         <motion.section initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="mt-12">
           <h2 className="font-display text-2xl">Winnings</h2>
           <div className="mt-6 grid gap-6 md:grid-cols-3">
-            <Card title="Total won"><p className="font-display text-4xl">£{totalWon.toFixed(2)}</p></Card>
-            <Card title="Pending payout"><p className="font-display text-4xl">£{pending.toFixed(2)}</p></Card>
+            <Card title="Total won"><p className="font-display text-4xl">₹${totalWon.toFixed(2)}</p></Card>
+            <Card title="Pending payout"><p className="font-display text-4xl">₹${pending.toFixed(2)}</p></Card>
             <Card title="Lifetime"><div className="flex items-center gap-3"><Trophy className="h-5 w-5 text-accent" /><p className="font-display text-xl">{winners.length} win{winners.length === 1 ? "" : "s"}</p></div></Card>
           </div>
 
@@ -257,7 +257,7 @@ const Dashboard = () => {
               {winners.map(w => (
                 <div key={w.id} className="grid grid-cols-12 items-center gap-4 border-b border-border px-6 py-5 last:border-b-0">
                   <div className="col-span-3"><p className="font-display text-2xl">{w.tier}-match</p></div>
-                  <div className="col-span-3"><p className="font-display text-xl">£{Number(w.prize_amount).toFixed(2)}</p></div>
+                  <div className="col-span-3"><p className="font-display text-xl">₹${Number(w.prize_amount).toFixed(2)}</p></div>
                   <div className="col-span-3">
                     <span className={`rounded-full px-3 py-1 text-[10px] uppercase tracking-[0.18em] ${
                       w.status === "paid" ? "bg-accent text-accent-foreground" :

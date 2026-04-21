@@ -117,20 +117,20 @@ const AdminDraws = () => {
                 </div>
                 <div className="text-right">
                   <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">Pool</p>
-                  <p className="font-display text-3xl">£{sim.pool.toFixed(2)}</p>
-                  {sim.rolloverIn > 0 && <p className="text-xs text-muted-foreground">incl. £{sim.rolloverIn.toFixed(2)} rollover</p>}
+                  <p className="font-display text-3xl">₹${sim.pool.toFixed(2)}</p>
+                  {sim.rolloverIn > 0 && <p className="text-xs text-muted-foreground">incl. ₹${sim.rolloverIn.toFixed(2)} rollover</p>}
                 </div>
               </div>
               <div className="mt-6 grid gap-3 md:grid-cols-3">
                 {([5, 4, 3] as const).map(t => (
                   <div key={t} className="rounded-sm border border-border p-4">
                     <p className="text-xs uppercase tracking-[0.18em] text-accent">{t}-match</p>
-                    <p className="mt-2 font-display text-2xl">£{sim.tiers[t].pot.toFixed(2)}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">{sim.tiers[t].winners.length} winner{sim.tiers[t].winners.length === 1 ? "" : "s"} · £{sim.tiers[t].perWinner.toFixed(2)} ea</p>
+                    <p className="mt-2 font-display text-2xl">₹${sim.tiers[t].pot.toFixed(2)}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">{sim.tiers[t].winners.length} winner{sim.tiers[t].winners.length === 1 ? "" : "s"} · ₹${sim.tiers[t].perWinner.toFixed(2)} ea</p>
                   </div>
                 ))}
               </div>
-              {sim.jackpotRolloverOut > 0 && <p className="mt-4 text-xs text-muted-foreground">No 5-match — £{sim.jackpotRolloverOut.toFixed(2)} will roll over.</p>}
+              {sim.jackpotRolloverOut > 0 && <p className="mt-4 text-xs text-muted-foreground">No 5-match — ₹${sim.jackpotRolloverOut.toFixed(2)} will roll over.</p>}
               <Button onClick={saveSimulation} variant="outline" className="mt-6"><Save className="mr-2 h-4 w-4" /> Save simulation</Button>
             </motion.div>
           )}
@@ -147,7 +147,7 @@ const AdminDraws = () => {
               {d.winning_numbers && <p className="mt-2 font-mono text-sm">{d.winning_numbers.join(" · ")}</p>}
             </div>
             <div className="text-right">
-              <p className="font-display text-xl">£{Number(d.prize_pool || 0).toFixed(2)}</p>
+              <p className="font-display text-xl">₹${Number(d.prize_pool || 0).toFixed(2)}</p>
               {d.status !== "published" && <Button size="sm" className="mt-2" onClick={() => publish(d.id)}><CheckCircle2 className="mr-2 h-3 w-3" /> Publish</Button>}
             </div>
           </div>

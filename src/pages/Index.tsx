@@ -140,13 +140,13 @@ const Index = () => {
               <div className="relative overflow-hidden rounded-sm border border-border bg-card p-10 shadow-quiet">
                 <Heart className="absolute right-8 top-8 h-5 w-5 text-accent" />
                 <p className="text-xs uppercase tracking-[0.18em] text-accent">This month</p>
-                <h3 className="mt-3 font-display text-3xl">{featured?.name ?? "Open Doors Foundation"}</h3>
+                <h3 className="mt-3 font-display text-3xl">{featured?.name ?? "Goonj"}</h3>
                 <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">
-                  {featured?.description ?? "Providing safe shelter and mentorship to young people leaving the care system across the UK."}
+                  {featured?.description ?? "Channeling urban surplus to rural and urban underserved communities across India, empowering dignity through sharing."}
                 </p>
                 <div className="mt-8 flex items-center justify-between border-t border-border/60 pt-6 text-sm">
                   <span className="text-muted-foreground">Member contribution</span>
-                  <span className="font-display text-xl">£0.00 <span className="text-xs text-muted-foreground">/ pending launch</span></span>
+                  <span className="font-display text-xl">₹0.00 <span className="text-xs text-muted-foreground">/ pending launch</span></span>
                 </div>
               </div>
             </div>

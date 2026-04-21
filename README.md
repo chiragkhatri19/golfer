@@ -1,3 +1,3 @@
-# Welcome to your Lovable project
+# Charity Drive
 
-TODO: Document your project here
+A charity donation management application built with React, TypeScript, and Supabase.
