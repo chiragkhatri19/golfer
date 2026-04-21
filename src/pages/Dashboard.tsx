@@ -1,7 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
-import { Plus, Trash2, Heart, Calendar as CalendarIcon, Trophy, Upload, CheckCircle2 } from "lucide-react";
+import { Plus, Trash2, Heart, Calendar as CalendarIcon, Trophy, Upload, CheckCircle2, Pencil, Save, X, Lock } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,6 +32,9 @@ const Dashboard = () => {
   const [drawsEntered, setDrawsEntered] = useState(0);
   const [newScore, setNewScore] = useState("");
   const [newDate, setNewDate] = useState(format(new Date(), "yyyy-MM-dd"));
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editScore, setEditScore] = useState("");
+  const [editDate, setEditDate] = useState("");
   const fileInputs = useRef<Record<string, HTMLInputElement | null>>({});
 
   useEffect(() => { document.title = "Dashboard — golfer"; }, []);
@@ -52,12 +56,15 @@ const Dashboard = () => {
   };
   useEffect(() => { refresh(); /* eslint-disable-next-line */ }, [user]);
 
+  const subActive = profile?.subscription_status === "active";
+
   const addScore = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
+    if (!subActive) return toast.error("Activate your subscription to log scores.");
     const n = parseInt(newScore, 10);
     if (isNaN(n) || n < 1 || n > 45) return toast.error("Score must be between 1 and 45.");
-    if (scores.some(s => s.date === newDate)) return toast.error("You already have a score for that date.");
+    if (scores.some(s => s.date === newDate)) return toast.error("You already have a score for that date — edit it instead.");
     const { error } = await supabase.from("scores").insert({ user_id: user.id, score: n, date: newDate });
     if (error) return toast.error(error.message);
     setNewScore(""); toast.success("Score added."); refresh();
@@ -66,7 +73,18 @@ const Dashboard = () => {
   const deleteScore = async (id: string) => {
     const { error } = await supabase.from("scores").delete().eq("id", id);
     if (error) return toast.error(error.message);
-    refresh();
+    toast.success("Score deleted."); refresh();
+  };
+
+  const startEdit = (s: Score) => { setEditingId(s.id); setEditScore(String(s.score)); setEditDate(s.date); };
+  const cancelEdit = () => { setEditingId(null); };
+  const saveEdit = async (id: string) => {
+    const n = parseInt(editScore, 10);
+    if (isNaN(n) || n < 1 || n > 45) return toast.error("Score must be between 1 and 45.");
+    if (scores.some(s => s.id !== id && s.date === editDate)) return toast.error("Another score exists for that date.");
+    const { error } = await supabase.from("scores").update({ score: n, date: editDate }).eq("id", id);
+    if (error) return toast.error(error.message);
+    setEditingId(null); toast.success("Score updated."); refresh();
   };
 
   const updateCharity = async (charity_id: string) => {
@@ -92,7 +110,6 @@ const Dashboard = () => {
     toast.success("Proof uploaded — awaiting verification."); refresh();
   };
 
-  const subActive = profile?.subscription_status === "active";
   const planPrice = profile?.subscription_plan ? (PLAN_PRICES[profile.subscription_plan] ?? 0) : 0;
   const contribution = (planPrice * (profile?.charity_pct ?? 10)) / 100;
   const totalWon = winners.reduce((s, w) => s + Number(w.prize_amount), 0);
@@ -109,6 +126,17 @@ const Dashboard = () => {
           </h1>
         </motion.div>
 
+        {!subActive && (
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+            className="mb-10 flex items-start gap-4 rounded-sm border border-accent/40 bg-accent-soft/30 p-5">
+            <Lock className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+            <div className="flex-1">
+              <p className="text-sm font-medium">Your subscription isn't active yet.</p>
+              <p className="mt-1 text-xs text-muted-foreground">Score entry and draw participation unlock once payment completes. An admin can activate manually for demo purposes.</p>
+            </div>
+          </motion.div>
+        )}
+
         <div className="grid gap-6 md:grid-cols-3">
           <Card title="Subscription">
             <div className="flex items-baseline justify-between">
@@ -121,7 +149,6 @@ const Dashboard = () => {
               {planPrice ? `£${planPrice.toFixed(2)} ${profile?.subscription_plan === "yearly" ? "/ year" : "/ month"}` : ""}
               {profile?.renewal_date && ` · renews ${format(new Date(profile.renewal_date), "PP")}`}
             </p>
-            {!subActive && <Button className="mt-5 w-full" disabled>Complete checkout (Stripe pending)</Button>}
           </Card>
 
           <Card title="Your charity">
@@ -143,6 +170,11 @@ const Dashboard = () => {
                   ? <>≈ <span className="text-foreground font-display">£{contribution.toFixed(2)}</span> per {profile?.subscription_plan === "yearly" ? "year" : "month"} to charity.</>
                   : "Activate a plan to see your contribution."}
               </p>
+              {profile?.charity_id && (
+                <Button asChild variant="ghost" size="sm" className="mt-3 w-full">
+                  <Link to={`/charities/${profile.charity_id}`}>View charity →</Link>
+                </Button>
+              )}
             </div>
           </Card>
 
@@ -165,12 +197,14 @@ const Dashboard = () => {
             <p className="mt-2 text-sm text-muted-foreground">Stableford 1–45. One per date. New scores replace the oldest of five.</p>
             <form onSubmit={addScore} className="mt-6 space-y-4 rounded-sm border border-border bg-card p-6 shadow-quiet">
               <div className="space-y-2"><Label>Date</Label>
-                <Input type="date" value={newDate} max={format(new Date(), "yyyy-MM-dd")} onChange={e => setNewDate(e.target.value)} />
+                <Input type="date" value={newDate} max={format(new Date(), "yyyy-MM-dd")} onChange={e => setNewDate(e.target.value)} disabled={!subActive} />
               </div>
               <div className="space-y-2"><Label>Score</Label>
-                <Input type="number" min={1} max={45} value={newScore} onChange={e => setNewScore(e.target.value)} placeholder="e.g. 32" />
+                <Input type="number" min={1} max={45} value={newScore} onChange={e => setNewScore(e.target.value)} placeholder="e.g. 32" disabled={!subActive} />
               </div>
-              <Button type="submit" className="w-full"><Plus className="mr-2 h-4 w-4" /> Add score</Button>
+              <Button type="submit" className="w-full" disabled={!subActive}>
+                {subActive ? <><Plus className="mr-2 h-4 w-4" /> Add score</> : <><Lock className="mr-2 h-4 w-4" /> Subscription required</>}
+              </Button>
             </form>
           </div>
 
@@ -181,11 +215,29 @@ const Dashboard = () => {
               {scores.map((s, i) => (
                 <motion.div key={s.id} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.04 }}
                   className="flex items-center justify-between border-b border-border px-6 py-5 last:border-b-0">
-                  <div>
-                    <p className="font-display text-3xl">{s.score}</p>
-                    <p className="mt-1 text-xs uppercase tracking-[0.18em] text-muted-foreground">{format(new Date(s.date), "PP")}</p>
-                  </div>
-                  <Button variant="ghost" size="icon" onClick={() => deleteScore(s.id)} aria-label="Delete"><Trash2 className="h-4 w-4" /></Button>
+                  {editingId === s.id ? (
+                    <>
+                      <div className="flex flex-1 items-center gap-3">
+                        <Input type="number" min={1} max={45} value={editScore} onChange={e => setEditScore(e.target.value)} className="w-20" />
+                        <Input type="date" max={format(new Date(), "yyyy-MM-dd")} value={editDate} onChange={e => setEditDate(e.target.value)} className="w-44" />
+                      </div>
+                      <div className="flex gap-1">
+                        <Button size="icon" variant="ghost" onClick={() => saveEdit(s.id)} aria-label="Save"><Save className="h-4 w-4" /></Button>
+                        <Button size="icon" variant="ghost" onClick={cancelEdit} aria-label="Cancel"><X className="h-4 w-4" /></Button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div>
+                        <p className="font-display text-3xl">{s.score}</p>
+                        <p className="mt-1 text-xs uppercase tracking-[0.18em] text-muted-foreground">{format(new Date(s.date), "PP")}</p>
+                      </div>
+                      <div className="flex gap-1">
+                        <Button variant="ghost" size="icon" onClick={() => startEdit(s)} aria-label="Edit"><Pencil className="h-4 w-4" /></Button>
+                        <Button variant="ghost" size="icon" onClick={() => deleteScore(s.id)} aria-label="Delete"><Trash2 className="h-4 w-4" /></Button>
+                      </div>
+                    </>
+                  )}
                 </motion.div>
               ))}
             </div>
