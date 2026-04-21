@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
 import { useIsAdmin } from "@/lib/roles";
 import { Shield } from "lucide-react";
+import { NotificationBell } from "@/components/NotificationBell";
 
 export const SiteNav = () => {
   const { user, signOut } = useAuth();
@@ -22,6 +23,7 @@ export const SiteNav = () => {
         <div className="flex items-center gap-2">
           {user ? (
             <>
+              <NotificationBell />
               {isAdmin && loc.pathname !== "/admin" && (
                 <Button asChild variant="ghost" size="sm"><Link to="/admin"><Shield className="mr-1.5 h-3.5 w-3.5" /> Admin</Link></Button>
               )}

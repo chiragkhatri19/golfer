@@ -11,23 +11,26 @@ const AdminReports = () => {
   useEffect(() => {
     document.title = "Admin · Reports — golfer";
     (async () => {
-      const [{ count: users }, { data: subs }, { count: drawsCount }, { data: winners }, { count: charitiesCount }] = await Promise.all([
+      const [{ count: users }, { data: activeProfiles }, { count: drawsCount }, { data: winners }, { count: charitiesCount }, { data: donations }] = await Promise.all([
         supabase.from("profiles").select("*", { count: "exact", head: true }),
-        supabase.from("subscriptions").select("plan,status").eq("status", "active"),
+        supabase.from("profiles").select("subscription_plan,charity_pct").eq("subscription_status", "active"),
         supabase.from("draws").select("*", { count: "exact", head: true }).eq("status", "published"),
         supabase.from("winners").select("prize_amount,status"),
         supabase.from("charities").select("*", { count: "exact", head: true }),
+        supabase.from("donations").select("amount"),
       ]);
-      const monthlyRevenue = (subs || []).reduce((s, x) => s + (PLAN_PRICES[x.plan] || 0), 0);
+      const monthlyRevenue = (activeProfiles || []).reduce((s, x: any) => s + (PLAN_PRICES[x.subscription_plan] || 0), 0);
+      const charityContribActual = (activeProfiles || []).reduce((s, x: any) => s + ((PLAN_PRICES[x.subscription_plan] || 0) * (x.charity_pct || 10)) / 100, 0);
       const totalPayouts = (winners || []).reduce((s, w) => s + Number(w.prize_amount || 0), 0);
-      const charityContribAtMin = monthlyRevenue * 0.1;
+      const totalDonations = (donations || []).reduce((s, d: any) => s + Number(d.amount || 0), 0);
       setStats([
         { label: "Total members", value: String(users || 0) },
-        { label: "Active subscriptions", value: String((subs || []).length) },
+        { label: "Active subscriptions", value: String((activeProfiles || []).length) },
         { label: "Charities listed", value: String(charitiesCount || 0) },
         { label: "Published draws", value: String(drawsCount || 0) },
         { label: "Recurring revenue", value: `£${monthlyRevenue.toFixed(2)}`, sub: "all active plans" },
-        { label: "Charity contribution", value: `£${charityContribAtMin.toFixed(2)}`, sub: "at 10% minimum" },
+        { label: "Charity contribution", value: `£${charityContribActual.toFixed(2)}`, sub: "actual, per member %" },
+        { label: "One-off donations", value: `£${totalDonations.toFixed(2)}`, sub: `${(donations || []).length} gifts` },
         { label: "Lifetime payouts", value: `£${totalPayouts.toFixed(2)}` },
         { label: "Pending payouts", value: String((winners || []).filter(w => w.status !== "paid").length) },
       ]);

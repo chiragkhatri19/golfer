@@ -5,6 +5,7 @@ import { ArrowLeft, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteNav } from "@/components/SiteNav";
 import { SiteFooter } from "@/components/SiteFooter";
+import { DonateDialog } from "@/components/DonateDialog";
 import { supabase } from "@/integrations/supabase/client";
 
 type Charity = { id: string; name: string; description: string; image_url: string | null; featured: boolean; events: any };
@@ -67,6 +68,11 @@ const CharityProfile = () => {
               <p className="mt-4 font-display text-2xl leading-tight">Direct a share of every payment to {charity.name}.</p>
               <p className="mt-3 text-sm text-muted-foreground">Members give a minimum of 10% — adjust upward any time.</p>
               <Button asChild className="mt-6 w-full"><Link to="/signup">Become a member</Link></Button>
+              <div className="my-4 flex items-center gap-3 text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                <span className="h-px flex-1 bg-border" /> or <span className="h-px flex-1 bg-border" />
+              </div>
+              <DonateDialog charityId={charity.id} charityName={charity.name} />
+              <p className="mt-3 text-[11px] text-muted-foreground">Make a one-off gift without subscribing.</p>
             </div>
           </div>
         </motion.div>
