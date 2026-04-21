@@ -132,7 +132,7 @@ const Dashboard = () => {
             <Lock className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
             <div className="flex-1">
               <p className="text-sm font-medium">Your subscription isn't active yet.</p>
-              <p className="mt-1 text-xs text-muted-foreground">Score entry and draw participation unlock once payment completes. An admin can activate manually for demo purposes.</p>
+              <p className="mt-1 text-xs text-muted-foreground">Score entry and draw participation unlock once payment completes.</p>
             </div>
           </motion.div>
         )}

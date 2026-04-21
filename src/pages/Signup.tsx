@@ -140,7 +140,7 @@ const Signup = () => {
                     );
                   })}
                   <p className="md:col-span-2 text-xs text-muted-foreground">
-                    Payment integration is currently in setup. You'll create your account now and complete checkout from your dashboard.
+                    Secure checkout opens after you create your account. Your membership activates once payment is confirmed.
                   </p>
                 </motion.div>
               )}

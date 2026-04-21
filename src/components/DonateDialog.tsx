@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
@@ -14,7 +13,6 @@ const schema = z.object({
   amount: z.number().positive().max(100000),
   donor_name: z.string().trim().max(100).optional(),
   donor_email: z.string().trim().email().max(255).optional().or(z.literal("")),
-  message: z.string().trim().max(500).optional(),
 });
 
 export const DonateDialog = ({ charityId, charityName, trigger }: { charityId: string; charityName: string; trigger?: React.ReactNode }) => {
@@ -23,12 +21,11 @@ export const DonateDialog = ({ charityId, charityName, trigger }: { charityId: s
   const [amount, setAmount] = useState("25");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const parsed = schema.safeParse({ amount: parseFloat(amount), donor_name: name || undefined, donor_email: email || undefined, message: message || undefined });
+    const parsed = schema.safeParse({ amount: parseFloat(amount), donor_name: name || undefined, donor_email: email || undefined });
     if (!parsed.success) return toast.error(Object.values(parsed.error.flatten().fieldErrors).flat()[0] || "Check your details.");
     setBusy(true);
     const { error } = await supabase.from("donations").insert({
@@ -36,13 +33,12 @@ export const DonateDialog = ({ charityId, charityName, trigger }: { charityId: s
       amount: parsed.data.amount,
       donor_name: parsed.data.donor_name ?? null,
       donor_email: parsed.data.donor_email || null,
-      message: parsed.data.message ?? null,
       user_id: user?.id ?? null,
     });
     setBusy(false);
     if (error) return toast.error(error.message);
     toast.success("Thank you. Your gift has been recorded.");
-    setOpen(false); setAmount("25"); setName(""); setEmail(""); setMessage("");
+    setOpen(false); setAmount("25"); setName(""); setEmail("");
   };
 
   return (
@@ -62,10 +58,7 @@ export const DonateDialog = ({ charityId, charityName, trigger }: { charityId: s
             <Input value={name} onChange={e => setName(e.target.value)} maxLength={100} /></div>
           <div className="space-y-2"><Label>Email (optional)</Label>
             <Input type="email" value={email} onChange={e => setEmail(e.target.value)} maxLength={255} /></div>
-          <div className="space-y-2"><Label>Message (optional)</Label>
-            <Textarea rows={3} maxLength={500} value={message} onChange={e => setMessage(e.target.value)} /></div>
           <Button type="submit" className="w-full" disabled={busy}>{busy ? "Recording…" : "Give"}</Button>
-          <p className="text-[11px] text-muted-foreground">Demo: gifts are recorded in the database. Connect a payment provider to capture real funds.</p>
         </form>
       </DialogContent>
     </Dialog>
